@@ -1,8 +1,34 @@
 on:
+  workflow_dispatch:
+    inputs:
+      leg:
+        description: "baseline (uninstrumented) or instrumented (under chalk/curiosity)"
+        type: choice
+        options: [instrumented, baseline]
+        default: instrumented
+      profile:
+        description: "CrashOverride chalk profile"
+        type: string
+        default: curiosity-tests-racecar
+      racecar_run:
+        description: "racecar correlation token, echoed into the run name"
+        type: string
+        default: ""
   push:
     branches-ignore:
       - 'maint'
       - 'stable'
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  # The one variable that separates the arms: on baseline, action-checkout
+  # skips its Set up Chalk step entirely.
+  CHALK_ON: ${{ github.event_name == 'workflow_dispatch' && inputs.leg != 'baseline' }}
+
+run-name: "rt.yml ${{ inputs.leg || 'push' }} ${{ inputs.racecar_run }}"
 
 jobs:
   rt_test_sqlite:
@@ -15,7 +41,18 @@ jobs:
           echo "RT_GA_START_TIME=$(date +%s)" >> $GITHUB_ENV
           echo "DOCKER_BUILDKIT=0" >> $GITHUB_ENV
       - name: Check out RT
-        uses: actions/checkout@v4
+        uses: crashappsec/action-checkout@main
+        with:
+          chalk: ${{ env.CHALK_ON }}
+          profile: ${{ inputs.profile || 'curiosity-tests-racecar' }}
+          observables_continue_on_error: false
+          lfs: false
+      - name: Assert instrumentation is live
+        if: env.CHALK_ON == 'true'
+        run: |
+          test -n "${CURIOSITY_ROOT:-}" || { echo "::error::CURIOSITY_ROOT unset - observables never installed"; exit 1; }
+          test -S "${CURIOSITY_SOCKET_NAME:?socket name unset}" || { echo "::error::co-hostd socket absent"; exit 1; }
+
       - name: Cache .prove state
         id: cache-prove-state
         uses: actions/cache@v4
@@ -68,7 +105,18 @@ jobs:
           echo "RT_GA_START_TIME=$(date +%s)" >> $GITHUB_ENV
           echo "DOCKER_BUILDKIT=0" >> $GITHUB_ENV
       - name: Checkout RT
-        uses: actions/checkout@v4
+        uses: crashappsec/action-checkout@main
+        with:
+          chalk: ${{ env.CHALK_ON }}
+          profile: ${{ inputs.profile || 'curiosity-tests-racecar' }}
+          observables_continue_on_error: false
+          lfs: false
+      - name: Assert instrumentation is live
+        if: env.CHALK_ON == 'true'
+        run: |
+          test -n "${CURIOSITY_ROOT:-}" || { echo "::error::CURIOSITY_ROOT unset - observables never installed"; exit 1; }
+          test -S "${CURIOSITY_SOCKET_NAME:?socket name unset}" || { echo "::error::co-hostd socket absent"; exit 1; }
+
       - name: Cache .prove state
         id: cache-prove-state
         uses: actions/cache@v4
@@ -123,7 +171,18 @@ jobs:
           echo "RT_GA_START_TIME=$(date +%s)" >> $GITHUB_ENV
           echo "DOCKER_BUILDKIT=0" >> $GITHUB_ENV
       - name: Checkout RT
-        uses: actions/checkout@v4
+        uses: crashappsec/action-checkout@main
+        with:
+          chalk: ${{ env.CHALK_ON }}
+          profile: ${{ inputs.profile || 'curiosity-tests-racecar' }}
+          observables_continue_on_error: false
+          lfs: false
+      - name: Assert instrumentation is live
+        if: env.CHALK_ON == 'true'
+        run: |
+          test -n "${CURIOSITY_ROOT:-}" || { echo "::error::CURIOSITY_ROOT unset - observables never installed"; exit 1; }
+          test -S "${CURIOSITY_SOCKET_NAME:?socket name unset}" || { echo "::error::co-hostd socket absent"; exit 1; }
+
       - name: Cache .prove state
         id: cache-prove-state
         uses: actions/cache@v4
@@ -177,7 +236,18 @@ jobs:
           echo "RT_GA_START_TIME=$(date +%s)" >> $GITHUB_ENV
           echo "DOCKER_BUILDKIT=0" >> $GITHUB_ENV
       - name: Checkout RT
-        uses: actions/checkout@v4
+        uses: crashappsec/action-checkout@main
+        with:
+          chalk: ${{ env.CHALK_ON }}
+          profile: ${{ inputs.profile || 'curiosity-tests-racecar' }}
+          observables_continue_on_error: false
+          lfs: false
+      - name: Assert instrumentation is live
+        if: env.CHALK_ON == 'true'
+        run: |
+          test -n "${CURIOSITY_ROOT:-}" || { echo "::error::CURIOSITY_ROOT unset - observables never installed"; exit 1; }
+          test -S "${CURIOSITY_SOCKET_NAME:?socket name unset}" || { echo "::error::co-hostd socket absent"; exit 1; }
+
       - name: Cache .prove state
         id: cache-prove-state
         uses: actions/cache@v4
