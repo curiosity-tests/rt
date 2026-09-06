@@ -26,7 +26,7 @@ permissions:
 env:
   # The one variable that separates the arms: on baseline, action-checkout
   # skips its Set up Chalk step entirely.
-  CHALK_ON: ${{ github.event_name == 'workflow_dispatch' && inputs.leg != 'baseline' }}
+  CHALK_ON: ${{ inputs.leg == 'instrumented' }}
 
 run-name: "rt.yml ${{ inputs.leg || 'push' }} ${{ inputs.racecar_run }}"
 
@@ -82,7 +82,7 @@ jobs:
           export RT_GA_TEST_TIME=$(date -u -d @"$RT_GA_TEST_TIME" +"%T")
           echo "RT_GA_TEST_TIME=$RT_GA_TEST_TIME" >> $GITHUB_ENV
       - name: Post results to Slack
-        if: ${{ always() && github.repository_owner == 'bestpractical' }}
+        if: ${{ always() && github.repository_owner == 'curiosity-tests' }}
         uses: welliba/simple-slack-notify@e1ff920c08c147568f1a40cffd47ce1fa7d4d22c
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_NOTIFICATIONS }}
@@ -148,7 +148,7 @@ jobs:
           export RT_GA_TEST_TIME=$(date -u -d @"$RT_GA_TEST_TIME" +"%T")
           echo "RT_GA_TEST_TIME=$RT_GA_TEST_TIME" >> $GITHUB_ENV
       - name: Post results to Slack
-        if: ${{ always() && github.repository_owner == 'bestpractical' }}
+        if: ${{ always() && github.repository_owner == 'curiosity-tests' }}
         uses: welliba/simple-slack-notify@e1ff920c08c147568f1a40cffd47ce1fa7d4d22c
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_NOTIFICATIONS }}
@@ -213,7 +213,7 @@ jobs:
           export RT_GA_TEST_TIME=$(date -u -d @"$RT_GA_TEST_TIME" +"%T")
           echo "RT_GA_TEST_TIME=$RT_GA_TEST_TIME" >> $GITHUB_ENV
       - name: Post results to Slack
-        if: ${{ always() && github.repository_owner == 'bestpractical' }}
+        if: ${{ always() && github.repository_owner == 'curiosity-tests' }}
         uses: welliba/simple-slack-notify@e1ff920c08c147568f1a40cffd47ce1fa7d4d22c
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_NOTIFICATIONS }}
@@ -279,7 +279,7 @@ jobs:
           export RT_GA_TEST_TIME=$(date -u -d @"$RT_GA_TEST_TIME" +"%T")
           echo "RT_GA_TEST_TIME=$RT_GA_TEST_TIME" >> $GITHUB_ENV
       - name: Post results to Slack
-        if: ${{ always() && github.repository_owner == 'bestpractical' }}
+        if: ${{ always() && github.repository_owner == 'curiosity-tests' }}
         uses: welliba/simple-slack-notify@e1ff920c08c147568f1a40cffd47ce1fa7d4d22c
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_NOTIFICATIONS }}
